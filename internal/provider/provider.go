@@ -92,6 +92,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 	return []func() resource.Resource{
 		NewOperationModeResource,
 		NewLanResource,
+		NewWireless24Resource,
 	}
 }
 

@@ -21,52 +21,59 @@ func main() {
 	defer pw.Stop()
 
 	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-		Headless: playwright.Bool(false), // Set to false to see the interaction for PoC
+		Headless: playwright.Bool(false), // false でブラウザの動作を目視確認
 	})
 	if err != nil {
 		log.Fatalf("could not launch browser: %v", err)
 	}
 	defer browser.Close()
 
-	// 2. Browser Context with basic auth
-	context, err := browser.NewContext(playwright.BrowserNewContextOptions{
-		HttpCredentials: &playwright.HttpCredentials{
-			Username: "admin",
-			Password: "admin",
-		},
-	})
-	if err != nil {
-		log.Fatalf("could not create context: %v", err)
-	}
-
-	page, err := context.NewPage()
+	page, err := browser.NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
 	}
 
+	// === 設定値 ===
 	endpoint := "http://192.168.1.1"
-	newSSID := "TP-Link_2.4GHz_PoC"
-	newPassword := "password123"
+	username := "admin"
+	password := "admin"
+	newSSID := "TP-Link_SSID_PoC"
+	// モード値: "11bgn mixed" = "13", "11bg mixed" = "10", "11b only" = "2", "11g only" = "3", "11n only (HT20)" = "8"
+	newMode := "n"
+	// チャンネル: "0" = 自動, "1"〜"13" = 各チャンネル番号
+	newChannel := "0"
+	// チャンネル幅: "Auto" = 自動, "20M" = 20MHz, "40M" = 40MHz
+	newChannelWidth := "Auto"
+	// SSID ブロードキャスト: true = 有効, false = 無効
+	ssidBroadcast := true
 
 	fmt.Printf("Navigating to %s...\n", endpoint)
 	if _, err = page.Goto(endpoint); err != nil {
 		log.Fatalf("could not goto: %v", err)
 	}
 
-	// 3. Handle login
-	fmt.Println("Waiting for login elements...")
-	_ = page.Locator("#userName").Fill("admin")
-	_ = page.Locator("#pcPassword").Fill("admin")
-	_ = page.Locator("#loginBtn").Click()
+	// 2. ログイン
+	fmt.Println("Attempting login...")
+	if err := page.Locator("#userName").WaitFor(); err != nil {
+		log.Fatalf("could not wait for username input: %v", err)
+	}
+	if err := page.Locator("#userName").Fill(username); err != nil {
+		log.Fatalf("could not fill username: %v", err)
+	}
+	if err := page.Locator("#pcPassword").Fill(password); err != nil {
+		log.Fatalf("could not fill password: %v", err)
+	}
+	if err := page.Locator("#loginBtn").Click(); err != nil {
+		log.Fatalf("could not click login: %v", err)
+	}
 
-	err = page.WaitForLoadState(playwright.PageWaitForLoadStateOptions{
+	if err = page.WaitForLoadState(playwright.PageWaitForLoadStateOptions{
 		State: playwright.LoadStateNetworkidle,
-	})
-	if err != nil {
+	}); err != nil {
 		log.Printf("wait for load state error: %v", err)
 	}
 
-	// 4. Extract frames and navigate
+	// 3. bottomLeftFrame を検索
 	fmt.Println("Searching for bottomLeftFrame...")
 	var leftFrame playwright.Frame
 	for i := 0; i < 10; i++ {
@@ -81,33 +88,32 @@ func main() {
 		}
 		time.Sleep(500 * time.Millisecond)
 	}
-
 	if leftFrame == nil {
 		log.Fatal("could not find bottomLeftFrame")
 	}
 
+	// 4. 「ワイヤレス 2.4GHz」メニューをクリック
 	fmt.Println("Clicking Wireless 2.4GHz menu...")
-	// Wireless 2.4GHz menu might have different text or ID
-	wireless24Loc := leftFrame.Locator("a:has-text('ワイヤレス 2.4GHz'), a:has-text('Wireless 2.4GHz'), #a7").First()
+	wireless24Loc := leftFrame.Locator("a:has-text('ワイヤレス 2.4GHz'), a:has-text('Wireless 2.4GHz')").First()
 	if err := wireless24Loc.WaitFor(); err != nil {
-		log.Fatalf("could not wait for Wireless 2.4GHz link: %v", err)
+		log.Fatalf("could not wait for Wireless 2.4GHz menu: %v", err)
 	}
 	if err := wireless24Loc.Click(); err != nil {
 		log.Fatalf("could not click Wireless 2.4GHz menu: %v", err)
 	}
-
 	time.Sleep(1 * time.Second)
 
-	fmt.Println("Clicking Wireless Settings submenu...")
-	settingsLoc := leftFrame.Locator("a:has-text('ワイヤレス設定'), a:has-text('Wireless Settings'), #a8").First()
-	if err := settingsLoc.WaitFor(); err != nil {
-		log.Fatalf("could not wait for wireless settings link: %v", err)
+	// 5. 「基本設定」サブメニューをクリック
+	fmt.Println("Clicking 基本設定 submenu...")
+	basicSettingsLoc := leftFrame.Locator("a:has-text('基本設定'), a:has-text('Basic Settings'), a:has-text('Wireless Settings')").First()
+	if err := basicSettingsLoc.WaitFor(); err != nil {
+		log.Fatalf("could not wait for 基本設定 link: %v", err)
 	}
-	if err := settingsLoc.Click(); err != nil {
-		log.Fatalf("could not click wireless settings submenu: %v", err)
+	if err := basicSettingsLoc.Click(); err != nil {
+		log.Fatalf("could not click 基本設定 submenu: %v", err)
 	}
 
-	// 5. Update Wireless Settings in mainFrame
+	// 6. mainFrame を検索
 	fmt.Println("Searching for mainFrame...")
 	var mainFrame playwright.Frame
 	for i := 0; i < 10; i++ {
@@ -122,13 +128,13 @@ func main() {
 		}
 		time.Sleep(500 * time.Millisecond)
 	}
-
 	if mainFrame == nil {
 		log.Fatal("could not find mainFrame")
 	}
 
-	fmt.Printf("Filling new SSID: %s\n", newSSID)
-	ssidInput := mainFrame.Locator("input#ssidName, input[name='ssidName']").First()
+	// 7. SSID フィールドに入力
+	fmt.Printf("Filling SSID: %s\n", newSSID)
+	ssidInput := mainFrame.Locator("input#ssid").First()
 	if err := ssidInput.WaitFor(); err != nil {
 		log.Fatalf("could not wait for SSID input: %v", err)
 	}
@@ -136,32 +142,60 @@ func main() {
 		log.Fatalf("could not fill SSID: %v", err)
 	}
 
-	fmt.Printf("Filling new Password: %s\n", newPassword)
-	// Some routers might have multiple password fields or different IDs
-	pwdInput := mainFrame.Locator("input#pskSecret, input[name='pskSecret'], input#password").First()
-	if err := pwdInput.WaitFor(); err != nil {
-		log.Fatalf("could not wait for Password input: %v", err)
-	}
-	if err := pwdInput.Fill(newPassword); err != nil {
-		log.Fatalf("could not fill Password: %v", err)
+	// 8. モード選択
+	fmt.Printf("Selecting Mode: %s\n", newMode)
+	modeSelect := mainFrame.Locator("select#mode").First()
+	if _, err := modeSelect.SelectOption(playwright.SelectOptionValues{Values: &[]string{newMode}}); err != nil {
+		log.Printf("could not select mode (skipping): %v", err)
 	}
 
-	// 6. Handle Save
-	fmt.Println("Clicking Save button...")
-	saveBtn := mainFrame.Locator("input#b_save, input.buttonBig[value*='保存'], input.buttonBig[value*='Save']").First()
+	// 9. チャンネル選択
+	fmt.Printf("Selecting Channel: %s\n", newChannel)
+	channelSelect := mainFrame.Locator("select#channel").First()
+	if _, err := channelSelect.SelectOption(playwright.SelectOptionValues{Values: &[]string{newChannel}}); err != nil {
+		log.Printf("could not select channel (skipping): %v", err)
+	}
 
-	// Capture dialog for confirmation
+	// 10. チャンネル幅選択
+	fmt.Printf("Selecting Channel Width: %s\n", newChannelWidth)
+	chanBWSelect := mainFrame.Locator("select#bandWidth").First()
+	if _, err := chanBWSelect.SelectOption(playwright.SelectOptionValues{Values: &[]string{newChannelWidth}}); err != nil {
+		log.Printf("could not select channel width (skipping): %v", err)
+	}
+
+	// 11. SSID ブロードキャスト
+	broadcastCheckbox := mainFrame.Locator("input#ssidBroadcast").First()
+	isChecked, err := broadcastCheckbox.IsChecked()
+	if err != nil {
+		log.Printf("could not check broadcast status (skipping): %v", err)
+	} else {
+		if ssidBroadcast && !isChecked {
+			fmt.Println("Enabling SSID broadcast...")
+			_ = broadcastCheckbox.Check()
+		} else if !ssidBroadcast && isChecked {
+			fmt.Println("Disabling SSID broadcast...")
+			_ = broadcastCheckbox.Uncheck()
+		} else {
+			fmt.Println("SSID broadcast already in desired state.")
+		}
+	}
+
+	// 12. 保存
+	fmt.Println("Saving settings...")
 	page.OnDialog(func(dialog playwright.Dialog) {
-		fmt.Printf("Dialog appeared: %s\n", dialog.Message())
+		fmt.Printf("Dialog: %s\n", dialog.Message())
 		dialog.Accept()
 	})
-
+	saveBtn := mainFrame.Locator("input.T_save").First()
+	if err := saveBtn.WaitFor(); err != nil {
+		log.Fatalf("could not wait for Save button: %v", err)
+	}
 	if err := saveBtn.Click(); err != nil {
-		log.Fatalf("could not click save: %v", err)
+		log.Fatalf("could not click Save button: %v", err)
 	}
 
-	fmt.Println("Waiting for router to process request (5s)...")
+	fmt.Println("Waiting for router to apply settings (5s)...")
 	time.Sleep(5 * time.Second)
 
-	fmt.Println("PoC Finished")
+	fmt.Println("\nPoC Finished successfully.")
 }

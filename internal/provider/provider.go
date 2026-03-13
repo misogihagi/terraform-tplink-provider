@@ -94,6 +94,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewLanResource,
 		NewWireless24Resource,
 		NewWirelessSecurityResource,
+		NewWirelessMacFilterResource,
 	}
 }
 

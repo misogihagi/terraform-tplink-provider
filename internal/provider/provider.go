@@ -98,6 +98,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewWireless24AdvancedResource,
 		NewGuestNetworkResource,
 		NewDhcpServerResource,
+		NewDhcpReservationResource,
 	}
 }
 

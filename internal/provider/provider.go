@@ -102,6 +102,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewVirtualServerResource,
 		NewPortTriggerResource,
 		NewDmzResource,
+		NewUpnpResource,
 	}
 }
 

@@ -104,6 +104,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewDmzResource,
 		NewUpnpResource,
 		NewBasicSecurityResource,
+		NewAdvancedSecurityResource,
 	}
 }
 

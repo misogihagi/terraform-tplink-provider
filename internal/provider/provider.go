@@ -106,6 +106,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewBasicSecurityResource,
 		NewAdvancedSecurityResource,
 		NewLocalManagementResource,
+		NewRemoteManagementResource,
 	}
 }
 

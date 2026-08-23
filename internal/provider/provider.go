@@ -111,6 +111,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewAccessControlResource,
 		NewAccessControlHostResource,
 		NewAccessControlTargetResource,
+		NewAccessControlScheduleResource,
 	}
 }
 

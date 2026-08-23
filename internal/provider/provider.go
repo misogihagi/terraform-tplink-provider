@@ -117,7 +117,9 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 }
 
 func (p *tplinkProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		NewSystemRoutesDataSource,
+	}
 }
 
 func New(version string) func() provider.Provider {

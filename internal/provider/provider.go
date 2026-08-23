@@ -113,6 +113,8 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewAccessControlTargetResource,
 		NewAccessControlScheduleResource,
 		NewStaticRouteResource,
+		NewBandwidthControlResource,
+		NewBandwidthControlRuleResource,
 	}
 }
 

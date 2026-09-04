@@ -115,6 +115,8 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewStaticRouteResource,
 		NewBandwidthControlResource,
 		NewBandwidthControlRuleResource,
+		NewIPMacBindingResource,
+		NewIPMacBindingEntryResource,
 	}
 }
 

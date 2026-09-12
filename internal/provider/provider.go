@@ -122,6 +122,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIPMacBindingEntryResource,
 		NewTimeSettingResource,
 		NewFirmwareUpgradeResource,
+		NewFactoryResetResource,
 	}
 }
 

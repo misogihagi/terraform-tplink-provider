@@ -123,6 +123,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewTimeSettingResource,
 		NewFirmwareUpgradeResource,
 		NewFactoryResetResource,
+		NewBackupRestoreResource,
 	}
 }
 

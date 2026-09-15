@@ -286,7 +286,7 @@ func setStatInterval(frame playwright.Frame) error {
 	}); err != nil {
 		return fmt.Errorf("could not select interval: %v", err)
 	}
-	_ = frame.Locator("#interval").DispatchEvent("change")
+	_ = frame.Locator("#interval").DispatchEvent("change", nil)
 	time.Sleep(1 * time.Second)
 
 	// The interval change may require a save as well via changeInterval();

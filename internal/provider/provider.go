@@ -134,6 +134,7 @@ func (p *tplinkProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewIpv6StatusDataSource,
 		NewSystemRoutesDataSource,
 		NewArpListDataSource,
+		NewSystemLogDataSource,
 		NewDiagnosticDataSource,
 	}
 }

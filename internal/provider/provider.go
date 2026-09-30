@@ -122,6 +122,7 @@ func (p *tplinkProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIPMacBindingEntryResource,
 		NewTimeSettingResource,
 		NewPasswordSettingsResource,
+		NewTrafficStatisticsResource,
 		NewFirmwareUpgradeResource,
 		NewFactoryResetResource,
 		NewBackupRestoreResource,
@@ -135,6 +136,7 @@ func (p *tplinkProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewSystemRoutesDataSource,
 		NewArpListDataSource,
 		NewSystemLogDataSource,
+		NewTrafficStatisticsDataSource,
 		NewDiagnosticDataSource,
 	}
 }

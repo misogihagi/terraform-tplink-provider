@@ -232,7 +232,7 @@ func (r *dhcpReservationResource) addReservation(ctx context.Context, data *dhcp
 	}
 	_ = macInput.Fill(data.MacAddress.ValueString())
 	_ = mainFrame.Locator("input#ipAddr").Fill(data.IpAddress.ValueString())
-	
+
 	status := "1" // Enabled
 	if !data.Enabled.ValueBool() {
 		status = "0" // Disabled

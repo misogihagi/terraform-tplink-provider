@@ -27,15 +27,15 @@ type ddnsResource struct {
 
 // ddnsResourceModel describes the resource data model.
 type ddnsResourceModel struct {
-	Provider      types.String   `tfsdk:"provider"`
-	DynDomain     types.String   `tfsdk:"dyn_domain"`
-	NoipDomain    types.String   `tfsdk:"noip_domain"`
-	CmxDomains    []types.String `tfsdk:"cmx_domains"`
-	Username      types.String   `tfsdk:"username"`
-	Password      types.String   `tfsdk:"password"`
-	WanIPBinding  types.Bool     `tfsdk:"wan_ip_binding"`
-	Enabled       types.Bool     `tfsdk:"enabled"`
-	Login         types.Bool     `tfsdk:"login"`
+	Provider     types.String   `tfsdk:"provider"`
+	DynDomain    types.String   `tfsdk:"dyn_domain"`
+	NoipDomain   types.String   `tfsdk:"noip_domain"`
+	CmxDomains   []types.String `tfsdk:"cmx_domains"`
+	Username     types.String   `tfsdk:"username"`
+	Password     types.String   `tfsdk:"password"`
+	WanIPBinding types.Bool     `tfsdk:"wan_ip_binding"`
+	Enabled      types.Bool     `tfsdk:"enabled"`
+	Login        types.Bool     `tfsdk:"login"`
 }
 
 func (r *ddnsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

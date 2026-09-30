@@ -27,10 +27,10 @@ type wireless24Resource struct {
 
 // wireless24ResourceModel describes the resource data model.
 type wireless24ResourceModel struct {
-	SSID           types.String `tfsdk:"ssid"`
-	Mode           types.String `tfsdk:"mode"`
-	Channel        types.String `tfsdk:"channel"`
-	ChannelWidth   types.String `tfsdk:"channel_width"`
+	SSID          types.String `tfsdk:"ssid"`
+	Mode          types.String `tfsdk:"mode"`
+	Channel       types.String `tfsdk:"channel"`
+	ChannelWidth  types.String `tfsdk:"channel_width"`
 	SSIDBroadcast types.Bool   `tfsdk:"ssid_broadcast"`
 }
 

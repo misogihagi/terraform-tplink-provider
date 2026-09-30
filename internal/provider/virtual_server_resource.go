@@ -251,7 +251,7 @@ func (r *virtualServerResource) addVirtualServer(ctx context.Context, data *virt
 	_ = portInput.Fill(data.ServicePort.ValueString())
 	_ = mainFrame.Locator("input#ipAddr").Fill(data.IpAddress.ValueString())
 	_ = mainFrame.Locator("input#interPort").Fill(data.InternalPort.ValueString())
-	
+
 	_, _ = mainFrame.Locator("select#protol").SelectOption(playwright.SelectOptionValues{
 		Values: playwright.StringSlice(data.Protocol.ValueString()),
 	})
